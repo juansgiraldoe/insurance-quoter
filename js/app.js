@@ -73,7 +73,7 @@ UI.prototype.mostrarMensaje = (mensaje, tipo) => {
   const formulario = document.querySelector('#cotizar-seguro')
 
   div.classList.add('mensaje', 'mt-10');
-  if (tipo == 'error') {
+  if (tipo === 'error') {
     div.classList.add('error');
   } else {
     div.classList.add('correcto');
@@ -87,6 +87,56 @@ UI.prototype.mostrarMensaje = (mensaje, tipo) => {
   }, 3000);
 }
 
+UI.prototype.mostrarResultado = (seguro, total) => {
+  const { marca, year, tipo} = seguro;
+
+  let textoMarca;
+  switch ( marca ) {
+    case '1':
+      textoMarca = 'Americano'
+      break;
+    case '2':
+      textoMarca = 'Asiatico'
+      break;
+    case '3':
+      textoMarca = 'Europeo'
+      break;
+  
+    default:
+      break;
+  }
+
+  ui.limpiarHtml();
+
+  const div = document.createElement('DIV');
+  div.classList.add('mt-10');
+  div.innerHTML = `
+  <p class="header">Tu resumen:</p>
+  <p class="font-bold">Marca: <span class="font-normal">${textoMarca}</span></p>
+  <p class="font-bold">Modelo: <span class="font-normal">${year}</span></p>
+  <p class="font-bold">Tipo: <span class="font-normal">${tipo.toUpperCase()}</span></p>
+  <p class="font-bold">Total: <span class="font-normal">$${total.toFixed(2)}</span></p>
+  
+  `;
+
+  const resultadoDiv = document.querySelector('#resultado')
+  
+  //Mostrar el spinner.
+  const spinner = document.querySelector('#cargando');
+  spinner.style.display = 'block';
+  setTimeout(() => {
+    spinner.style.display = 'none';
+    resultadoDiv.appendChild(div);
+  }, 3000);
+  
+}
+
+UI.prototype.limpiarHtml = () => {
+  const resultadoDiv = document.querySelector('#resultado')
+  while (resultadoDiv.firstChild) {
+    resultadoDiv.removeChild(resultadoDiv.firstChild)
+  }
+}
 //Instanciar UI.
 const ui = new UI();
 
@@ -117,7 +167,9 @@ function cotizarSeguro(e) {
 
   //Instanciar el seguro.
   const seguro = new Seguro(marca, year, tipo)
-  seguro.cotizarSeguro();
+  const total = seguro.cotizarSeguro();
 
   //Utilizar el Prototipe parac calcular el valor del seguro.
+
+  ui.mostrarResultado(seguro, total)
 }
